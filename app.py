@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 
 # ── Load model + feature importances ────────────────────────────────────────
-model              = joblib.load("carbon_model.pkl")
+model = joblib.load("carbon_model.pkl")
 feature_importance = joblib.load("feature_importance.pkl")
 
 
@@ -103,8 +103,6 @@ def predict():
         return jsonify({"error": f"Missing field: {e}"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 
 
 @app.route("/coach", methods=["POST"])
