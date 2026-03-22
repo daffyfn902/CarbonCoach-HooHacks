@@ -629,6 +629,9 @@
     <div class="chart-card">
       <div class="chart-title">What's driving your footprint</div>
       <div class="contrib-list" id="contribList"></div>
+      <p style="font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 16px;">
+        * Estimates are based on behavioral survey data and may not reflect exact real-world emissions.
+      </p>
     </div>
 
 
@@ -757,13 +760,13 @@
 
 
     let cls, icon, label;
-    if (kg < US_AVG * 0.5) {
+    if (kg < US_AVG * 0.6) {
       cls='verdict-low';    icon='✅'; label='Low footprint';
       num.style.color = 'var(--green)';
-    } else if (kg < US_AVG * 0.85) {
+    } else if (kg < US_AVG * 0.9) {
       cls='verdict-medium'; icon='⚠️'; label='Moderate footprint';
       num.style.color = 'var(--amber)';
-    } else if (kg < US_AVG * 1.15) {
+    } else if (kg < US_AVG * 1.2) {
       cls='verdict-high';   icon='🟠'; label='High footprint';
       num.style.color = '#e8844a';
     } else {

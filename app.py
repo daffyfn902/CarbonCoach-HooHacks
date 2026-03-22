@@ -72,13 +72,20 @@ def predict():
         heat_key    = f"Heating Energy Source_{data['heating_source']}"
 
 
+        max_vehicle_km = 9000  # highest option in the survey
+
+        # if no car, driving contributes nothing
+        driving_contribution = 0 if vehicle_type is None else (
+            feature_importance.get("Vehicle Monthly Distance Km", 0) * (float(data["vehicle_km"]) / max_vehicle_km)
+        )
+
         user_contributions = {
-            "Monthly Driving":  feature_importance.get("Vehicle Monthly Distance Km", 0),
-            "Air Travel":       feature_importance.get(air_key, 0),
-            "Vehicle Type":     feature_importance.get(vehicle_key, 0),
-            "New Clothes":      feature_importance.get("How Many New Clothes Monthly", 0),
-            "Waste Production": feature_importance.get("Waste Bag Weekly Count", 0),
-            "Heating Source":   feature_importance.get(heat_key, 0),
+        "Monthly Driving":  driving_contribution,
+        "Air Travel":       feature_importance.get(air_key, 0),
+        "Vehicle Type":     0 if vehicle_type is None else feature_importance.get(vehicle_key, 0),
+        "New Clothes":      feature_importance.get("How Many New Clothes Monthly", 0) * (float(data["new_clothes"]) / 7),
+        "Waste Production": feature_importance.get("Waste Bag Weekly Count", 0) * (float(data["waste_bags"]) / 4),
+        "Heating Source":   feature_importance.get(heat_key, 0),
         }
 
 
@@ -143,13 +150,12 @@ def coach():
         air_label     = air_map.get(data["air_travel"],           data["air_travel"])
         clothes_label = clothes_map.get(str(data["new_clothes"]), str(data["new_clothes"]))
         waste_label   = waste_map.get(str(data["waste_bags"]),    str(data["waste_bags"]))
-        vehicle_label = "no car" if data["vehicle_type"] == "none" else data["vehicle_type"]
+        vehicle_label = "no car (does not drive at all)" if data["vehicle_type"] == "none" else data["vehicle_type"]
 
-
-        contributors_text = "\n".join(
-            f"  - {name}: {round(weight * 100, 1)}% contribution"
+        total = sum(weight for _, weight in contributors)
+        contributors_text = "\n".join(f"  - {name}: {round((weight / total) * 100, 1)}% of this user's footprint"
             for name, weight in contributors
-        )
+        ) if total > 0 else ""
 
 
         percent_vs_avg = round((kg / us_avg) * 100)
