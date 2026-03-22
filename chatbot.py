@@ -1,6 +1,8 @@
 import os
 from google import genai
 from dotenv import load_dotenv
+import model
+import app
 
 # 1. Initialize the client
 # Ensure your GEMINI_API_KEY is set in your environment variables
@@ -11,12 +13,28 @@ api_key = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
+system_prompt = f"""
+You are a sustainability assistant.
+
+User data:
+- Transportation: {transport}
+- Diet: {diet}
+- Energy use: {energy}
+
+Model prediction:
+- Estimated carbon footprint: {prediction} metric tons/year
+
+Give personalized, practical ways to reduce this footprint.
+Be specific and prioritize biggest impact actions.
+"""
+
+
 def start_chat():
     # 2. Create a chat session with a system instruction
     chat = client.chats.create(
         model="gemini-2.0-flash",
         config={
-            "system_instruction": "You are a helpful and friendly AI assistant."
+            "system_instruction": system_prompt
         }
     )
 
