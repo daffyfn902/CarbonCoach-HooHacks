@@ -9,6 +9,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+
     :root {
       --bg:        #0e1a12;
       --surface:   #162019;
@@ -23,7 +24,9 @@
       --white:     #f0f7f2;
     }
 
+
     html { scroll-behavior: smooth; }
+
 
     body {
       background: var(--bg);
@@ -33,7 +36,7 @@
       overflow-x: hidden;
     }
 
-    /* ── Background texture ── */
+
     body::before {
       content: '';
       position: fixed; inset: 0;
@@ -44,12 +47,14 @@
       z-index: 0;
     }
 
+
     /* ── Header ── */
     header {
       position: relative; z-index: 1;
       text-align: center;
       padding: 60px 24px 40px;
     }
+
 
     .header-badge {
       display: inline-flex; align-items: center; gap: 8px;
@@ -65,6 +70,7 @@
     .header-badge::before { content: '●'; font-size: 8px; color: var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+
     h1 {
       font-family: 'DM Serif Display', serif;
       font-size: clamp(2.4rem, 6vw, 4rem);
@@ -74,6 +80,7 @@
     }
     h1 em { color: var(--green); font-style: italic; }
 
+
     .subtitle {
       color: var(--muted);
       font-size: 15px;
@@ -81,6 +88,7 @@
       margin: 0 auto;
       line-height: 1.6;
     }
+
 
     /* ── Progress ── */
     .progress-wrap {
@@ -107,14 +115,15 @@
       transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* ── Form wrapper ── */
+
+    /* ── Form ── */
     #surveyForm {
       position: relative; z-index: 1;
       max-width: 680px; margin: 0 auto;
       padding: 0 24px 80px;
     }
 
-    /* ── Question cards ── */
+
     .q-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -136,33 +145,19 @@
     .q-card:nth-child(5) { animation-delay: 0.25s }
     .q-card:nth-child(6) { animation-delay: 0.30s }
 
-    .q-header {
-      display: flex; align-items: flex-start; gap: 14px;
-      margin-bottom: 22px;
-    }
 
-    .q-icon {
-      font-size: 22px; line-height: 1;
-      flex-shrink: 0; margin-top: 1px;
-    }
-
+    .q-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
+    .q-icon { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
     .q-meta { flex: 1; }
-
     .q-num {
       font-family: 'DM Mono', monospace;
       font-size: 10px; letter-spacing: 0.12em;
-      color: var(--green); text-transform: uppercase;
-      margin-bottom: 4px;
+      color: var(--green); text-transform: uppercase; margin-bottom: 4px;
     }
+    .q-label { font-size: 16px; font-weight: 700; color: var(--white); line-height: 1.3; }
 
-    .q-label {
-      font-size: 16px; font-weight: 700;
-      color: var(--white); line-height: 1.3;
-    }
 
-    /* ── Radio options ── */
     .options { display: flex; flex-direction: column; gap: 10px; }
-
     .option {
       display: flex; align-items: center; gap: 14px;
       background: var(--surface);
@@ -175,10 +170,8 @@
     }
     .option:hover { border-color: var(--green-dim); background: #1e2e22; }
     .option input[type="radio"] { display: none; }
-    .option.selected {
-      border-color: var(--green);
-      background: #1d3325;
-    }
+    .option.selected { border-color: var(--green); background: #1d3325; }
+
 
     .option-key {
       font-family: 'DM Mono', monospace;
@@ -192,50 +185,25 @@
       flex-shrink: 0;
       transition: all 0.2s;
     }
-    .option.selected .option-key {
-      background: var(--green);
-      border-color: var(--green);
-      color: var(--bg);
-      font-weight: 700;
-    }
-
+    .option.selected .option-key { background: var(--green); border-color: var(--green); color: var(--bg); font-weight: 700; }
     .option-text { flex: 1; }
-    .option-name {
-      font-size: 14px; font-weight: 600;
-      color: var(--white); margin-bottom: 2px;
-    }
-    .option-desc {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px; color: var(--muted);
-    }
+    .option-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .option-desc { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
 
-    /* ── Submit button ── */
-    .submit-wrap {
-      margin-top: 32px; text-align: center;
-    }
 
+    .submit-wrap { margin-top: 32px; text-align: center; }
     button[type="submit"] {
-      background: var(--green);
-      color: var(--bg);
-      border: none;
-      border-radius: 100px;
+      background: var(--green); color: var(--bg);
+      border: none; border-radius: 100px;
       padding: 16px 48px;
-      font-family: 'Syne', sans-serif;
-      font-size: 15px; font-weight: 700;
-      letter-spacing: 0.04em;
-      cursor: pointer;
+      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+      letter-spacing: 0.04em; cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-      box-shadow: 0 0 0 0 #5dbd7a44;
     }
-    button[type="submit"]:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px #5dbd7a33;
-      background: #6ed18c;
-    }
+    button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 8px 32px #5dbd7a33; background: #6ed18c; }
     button[type="submit"]:active { transform: translateY(0); }
-    button[type="submit"]:disabled {
-      background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none;
-    }
+    button[type="submit"]:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
 
     /* ── Results ── */
     #results {
@@ -246,67 +214,106 @@
       animation: slideUp 0.5s ease both;
     }
 
-    .result-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 36px 32px;
-      margin-bottom: 16px;
-    }
 
+    .result-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 36px 32px; margin-bottom: 16px;
+    }
     .result-number {
       font-family: 'DM Serif Display', serif;
       font-size: clamp(3rem, 10vw, 5.5rem);
-      line-height: 1;
-      margin-bottom: 4px;
+      line-height: 1; margin-bottom: 4px;
     }
     .result-number span { font-size: 0.4em; font-family: 'Syne', sans-serif; font-weight: 600; color: var(--muted); vertical-align: super; }
 
+
     .result-verdict {
       display: inline-flex; align-items: center; gap: 8px;
-      border-radius: 100px;
-      padding: 6px 16px;
-      font-size: 13px; font-weight: 700;
-      margin: 16px 0;
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 13px; font-weight: 700; margin: 16px 0;
     }
     .verdict-low    { background: #1a3d2a; color: #5dbd7a; border: 1px solid #2e6040; }
     .verdict-medium { background: #3d3010; color: #e8b94a; border: 1px solid #6b5520; }
     .verdict-high   { background: #3d2010; color: #e8844a; border: 1px solid #6b3a20; }
     .verdict-very   { background: #3d1510; color: #e06b55; border: 1px solid #6b2818; }
 
-    .result-tip {
-      color: var(--muted); font-size: 14px; line-height: 1.6;
-      margin-top: 8px;
-    }
 
     .chart-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 32px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 32px; margin-bottom: 16px;
     }
     .chart-title {
       font-size: 13px; font-weight: 700; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 0.1em;
-      margin-bottom: 20px;
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px;
     }
 
+
+    /* ── Contribution bars ── */
+    .contrib-list { display: flex; flex-direction: column; gap: 14px; }
+    .contrib-row { display: flex; flex-direction: column; gap: 6px; }
+    .contrib-header { display: flex; justify-content: space-between; align-items: center; }
+    .contrib-name { font-size: 12px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; }
+    .contrib-pct  { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .contrib-track { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .contrib-fill {
+      height: 100%; width: 0%;
+      border-radius: 4px; background: var(--green);
+      transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+
+    /* ── AI Coach card ── */
+    .coach-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 32px; margin-bottom: 16px;
+    }
+    .coach-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .coach-icon {
+      width: 36px; height: 36px;
+      background: #1a3d2a; border: 1px solid var(--green-dim);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .coach-title { font-size: 15px; font-weight: 700; color: var(--white); }
+    .coach-subtitle { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+
+    .skeleton-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .skeleton-line {
+      height: 13px; border-radius: 4px;
+      background: linear-gradient(90deg, var(--border) 25%, #3a5542 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skeleton-line:nth-child(1) { width: 100%; }
+    .skeleton-line:nth-child(2) { width: 88%; }
+    .skeleton-line:nth-child(3) { width: 94%; }
+    .skeleton-line:nth-child(4) { width: 72%; margin-top: 4px; }
+    .skeleton-line:nth-child(5) { width: 85%; }
+    .skeleton-line:nth-child(6) { width: 60%; }
+
+
+    .coach-text { display: none; font-size: 14px; line-height: 1.8; color: var(--text); }
+    .coach-text p { margin-bottom: 14px; }
+    .coach-text p:last-child { margin-bottom: 0; }
+    .coach-bullet { display: flex; gap: 10px; margin-bottom: 6px; }
+    .coach-bullet-dot { color: var(--green); flex-shrink: 0; font-size: 16px; line-height: 1.7; }
+
+
+    /* ── Retry ── */
     .retry-btn {
       display: inline-flex; align-items: center; gap: 8px;
-      background: transparent;
-      border: 1.5px solid var(--border);
-      border-radius: 100px;
-      padding: 12px 28px;
-      font-family: 'Syne', sans-serif;
-      font-size: 14px; font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-      margin-top: 24px;
+      background: transparent; border: 1.5px solid var(--border);
+      border-radius: 100px; padding: 12px 28px;
+      font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600;
+      color: var(--muted); cursor: pointer;
+      transition: border-color 0.2s, color 0.2s; margin-top: 24px;
     }
     .retry-btn:hover { border-color: var(--green); color: var(--green); }
 
-    /* ── Error ── */
+
     .error-toast {
       background: #2e1a18; border: 1px solid #6b2a22;
       border-radius: 10px; padding: 14px 18px;
@@ -314,25 +321,26 @@
       display: none; margin-top: 16px;
     }
 
-    /* ── Loading spinner ── */
+
     .spinner {
       width: 18px; height: 18px;
-      border: 2px solid #1c3325;
-      border-top-color: var(--green);
+      border: 2px solid #1c3325; border-top-color: var(--green);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       display: inline-block; vertical-align: middle; margin-right: 8px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+
     @media (max-width: 500px) {
-      .q-card { padding: 22px 20px; }
-      .result-card, .chart-card { padding: 24px 20px; }
+      .q-card, .result-card, .chart-card, .coach-card { padding: 22px 20px; }
     }
   </style>
 </head>
 
+
 <body>
+
 
   <header>
     <div class="header-badge">Carbon Footprint Predictor</div>
@@ -340,7 +348,7 @@
     <p class="subtitle">Answer 6 quick questions and we'll estimate your annual carbon footprint.</p>
   </header>
 
-  <!-- Progress -->
+
   <div class="progress-wrap">
     <span class="progress-label">Progress</span>
     <span class="progress-label" id="progressText">0 / 6</span>
@@ -349,7 +357,9 @@
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
   </div>
 
+
   <form id="surveyForm">
+
 
     <!-- Q1: Driving -->
     <div class="q-card">
@@ -387,6 +397,7 @@
         </label>
       </div>
     </div>
+
 
     <!-- Q2: Vehicle Type -->
     <div class="q-card">
@@ -433,6 +444,7 @@
       </div>
     </div>
 
+
     <!-- Q3: Air Travel -->
     <div class="q-card">
       <div class="q-header">
@@ -469,6 +481,7 @@
         </label>
       </div>
     </div>
+
 
     <!-- Q4: Clothing -->
     <div class="q-card">
@@ -507,6 +520,7 @@
       </div>
     </div>
 
+
     <!-- Q5: Waste -->
     <div class="q-card">
       <div class="q-header">
@@ -543,6 +557,7 @@
         </label>
       </div>
     </div>
+
 
     <!-- Q6: Heating -->
     <div class="q-card">
@@ -581,39 +596,80 @@
       </div>
     </div>
 
+
     <div class="submit-wrap">
       <div class="error-toast" id="errorToast">⚠ Please answer all 6 questions before submitting.</div>
       <button type="submit" id="submitBtn" disabled>Calculate my footprint →</button>
     </div>
 
+
   </form>
 
-  <!-- Results -->
+
+  <!-- ── Results ── -->
   <div id="results">
+
+
+    <!-- Score -->
     <div class="result-card">
       <div class="q-num" style="margin-bottom:10px;">Your Estimated Footprint</div>
       <div class="result-number" id="resultNumber" style="color: var(--green)">—</div>
       <div id="resultVerdict"></div>
     </div>
+
+
+    <!-- You vs Average -->
     <div class="chart-card">
       <div class="chart-title">You vs. Average</div>
       <canvas id="chart" height="160"></canvas>
     </div>
+
+
+    <!-- Contribution breakdown -->
+    <div class="chart-card">
+      <div class="chart-title">What's driving your footprint</div>
+      <div class="contrib-list" id="contribList"></div>
+    </div>
+
+
+    <!-- AI Coach -->
+    <div class="coach-card">
+      <div class="coach-header">
+        <div class="coach-icon">🌱</div>
+        <div>
+          <div class="coach-title">AI Sustainability Coach</div>
+          <div class="coach-subtitle">Powered by Gemini</div>
+        </div>
+      </div>
+      <div class="skeleton-wrap" id="coachSkeleton">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+      </div>
+      <div class="coach-text" id="coachText"></div>
+    </div>
+
+
     <div style="text-align:center">
       <button class="retry-btn" id="retryBtn">↩ Retake survey</button>
     </div>
+
+
   </div>
+
 
 <script>
   const US_AVG = 4000;
-
-  // ── Progress tracking ──────────────────────────────────────────────────────
   const answered = new Set();
 
+
+  // ── Progress ───────────────────────────────────────────────────────────────
   document.querySelectorAll('.options').forEach(group => {
     group.querySelectorAll('.option').forEach(opt => {
       opt.addEventListener('click', () => {
-        // clear selected in this group
         group.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
         opt.classList.add('selected');
         opt.querySelector('input').checked = true;
@@ -623,6 +679,7 @@
     });
   });
 
+
   function updateProgress() {
     const n = answered.size;
     document.getElementById('progressText').textContent = `${n} / 6`;
@@ -630,9 +687,11 @@
     document.getElementById('submitBtn').disabled = n < 6;
   }
 
-  // ── Form submit ────────────────────────────────────────────────────────────
+
+  // ── Submit ─────────────────────────────────────────────────────────────────
   document.getElementById('surveyForm').addEventListener('submit', function(e) {
     e.preventDefault();
+
 
     if (answered.size < 6) {
       document.getElementById('errorToast').style.display = 'block';
@@ -640,9 +699,11 @@
     }
     document.getElementById('errorToast').style.display = 'none';
 
+
     const btn = document.getElementById('submitBtn');
     btn.innerHTML = '<span class="spinner"></span>Calculating…';
     btn.disabled = true;
+
 
     const payload = {
       vehicle_km:     Number(document.querySelector('[name="driving"]:checked').value),
@@ -653,6 +714,7 @@
       heating_source: document.querySelector('[name="heating"]:checked').value,
     };
 
+
     fetch('/predict', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -661,7 +723,14 @@
     .then(r => r.json())
     .then(data => {
       if (data.error) throw new Error(data.error);
-      showResults(data.user_emissions ?? data.prediction);
+
+
+      // show results immediately
+      showResults(data.user_emissions, data.ranked_contributors);
+
+
+      // fire coach in parallel — don't block
+      fetchCoach(payload, data.user_emissions, data.us_average, data.ranked_contributors);
     })
     .catch(err => {
       btn.innerHTML = 'Calculate my footprint →';
@@ -671,39 +740,43 @@
     });
   });
 
+
   // ── Show results ───────────────────────────────────────────────────────────
-  function showResults(kg) {
+  function showResults(kg, contributors) {
     document.getElementById('surveyForm').style.display = 'none';
     document.querySelector('header').style.display = 'none';
     document.querySelector('.progress-wrap').style.display = 'none';
     document.querySelector('.progress-bar-wrap').style.display = 'none';
 
-    const res = document.getElementById('results');
-    res.style.display = 'block';
+
+    document.getElementById('results').style.display = 'block';
+
 
     const num = document.getElementById('resultNumber');
     num.innerHTML = `${kg.toLocaleString()}<span>kg CO₂/yr</span>`;
 
-    // verdict
+
     let cls, icon, label;
     if (kg < US_AVG * 0.5) {
-      cls='verdict-low'; icon='✅'; label='Low footprint';
+      cls='verdict-low';    icon='✅'; label='Low footprint';
       num.style.color = 'var(--green)';
     } else if (kg < US_AVG * 0.85) {
       cls='verdict-medium'; icon='⚠️'; label='Moderate footprint';
       num.style.color = 'var(--amber)';
     } else if (kg < US_AVG * 1.15) {
-      cls='verdict-high'; icon='🟠'; label='High footprint';
+      cls='verdict-high';   icon='🟠'; label='High footprint';
       num.style.color = '#e8844a';
     } else {
-      cls='verdict-very'; icon='🔴'; label='Very high footprint';
+      cls='verdict-very';   icon='🔴'; label='Very high footprint';
       num.style.color = 'var(--red)';
     }
+
 
     document.getElementById('resultVerdict').innerHTML =
       `<div class="result-verdict ${cls}">${icon} ${label}</div>`;
 
-    // chart
+
+    // you vs average chart
     if (window.myChart) window.myChart.destroy();
     window.myChart = new Chart(document.getElementById('chart'), {
       type: 'bar',
@@ -713,30 +786,121 @@
           data: [kg, US_AVG],
           backgroundColor: ['#5dbd7a33', '#e8b94a22'],
           borderColor:     ['#5dbd7a',   '#e8b94a'],
-          borderWidth: 2,
-          borderRadius: 8,
+          borderWidth: 2, borderRadius: 8,
         }]
       },
       options: {
         responsive: true,
         plugins: {
           legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.parsed.y.toLocaleString()} kg CO₂`
-            }
-          }
+          tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y.toLocaleString()} kg CO₂` } }
         },
         scales: {
           x: { ticks: { color: '#6e917a', font: { family: 'DM Mono', size: 11 } }, grid: { display: false }, border: { display: false } },
-          y: {
-            ticks: { color: '#6e917a', font: { family: 'DM Mono', size: 10 }, callback: v => v.toLocaleString() },
-            grid: { color: '#2e453522' }, border: { display: false }
-          }
+          y: { ticks: { color: '#6e917a', font: { family: 'DM Mono', size: 10 }, callback: v => v.toLocaleString() }, grid: { color: '#2e453522' }, border: { display: false } }
         }
       }
     });
+
+
+    renderContributions(contributors);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+
+  // ── Contribution bars ──────────────────────────────────────────────────────
+  function renderContributions(contributors) {
+    const list = document.getElementById('contribList');
+    list.innerHTML = '';
+
+
+    const total = contributors.reduce((sum, c) => sum + c[1], 0);
+
+
+    contributors.forEach(([name, weight]) => {
+      const pct = total > 0 ? Math.round((weight / total) * 100) : 0;
+      const row = document.createElement('div');
+      row.className = 'contrib-row';
+      row.innerHTML = `
+        <div class="contrib-header">
+          <span class="contrib-name">${name}</span>
+          <span class="contrib-pct">${pct}%</span>
+        </div>
+        <div class="contrib-track">
+          <div class="contrib-fill" data-pct="${pct}"></div>
+        </div>`;
+      list.appendChild(row);
+    });
+
+
+    // animate after paint
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.contrib-fill').forEach(bar => {
+        bar.style.width = bar.dataset.pct + '%';
+      });
+    });
+  }
+
+
+  // ── Fetch AI coach ─────────────────────────────────────────────────────────
+  function fetchCoach(payload, kg, usAvg, contributors) {
+    const coachPayload = {
+      vehicle_km:          payload.vehicle_km,
+      vehicle_type:        payload.vehicle_type,
+      air_travel:          payload.air_travel,
+      new_clothes:         payload.new_clothes,
+      waste_bags:          payload.waste_bags,
+      heating_source:      payload.heating_source,
+      prediction_kg:       kg,
+      us_average:          usAvg,
+      ranked_contributors: contributors,
+    };
+
+
+    fetch('/coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(coachPayload),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) throw new Error(data.error);
+      renderCoach(data.coach_response);
+    })
+    .catch(err => {
+      renderCoach(`Unable to load coach recommendations: ${err.message}`);
+    });
+  }
+
+
+  // ── Render coach text ──────────────────────────────────────────────────────
+  function renderCoach(text) {
+    document.getElementById('coachSkeleton').style.display = 'none';
+
+
+    const el = document.getElementById('coachText');
+    el.style.display = 'block';
+
+
+    // split into paragraphs
+    const paragraphs = text.trim().split(/\n\n+/);
+
+
+    el.innerHTML = paragraphs.map(para => {
+      const lines = para.trim().split('\n');
+      const formatted = lines.map(line => {
+        if (line.trim().startsWith('•')) {
+          return `<div class="coach-bullet">
+            <span class="coach-bullet-dot">•</span>
+            <span>${line.replace(/^•\s*/, '')}</span>
+          </div>`;
+        }
+        return `<span>${line}</span>`;
+      }).join('');
+      return `<p>${formatted}</p>`;
+    }).join('');
+  }
+
 
   // ── Retry ──────────────────────────────────────────────────────────────────
   document.getElementById('retryBtn').addEventListener('click', () => {
@@ -750,9 +914,20 @@
     answered.clear();
     updateProgress();
     document.getElementById('submitBtn').innerHTML = 'Calculate my footprint →';
+
+
+    // reset coach for next run
+    document.getElementById('coachSkeleton').style.display = 'flex';
+    document.getElementById('coachText').style.display = 'none';
+    document.getElementById('coachText').innerHTML = '';
+    document.getElementById('contribList').innerHTML = '';
+
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 </script>
 
+
 </body>
 </html>
+
