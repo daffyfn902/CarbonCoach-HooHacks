@@ -4,10 +4,8 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Load the trained model pipeline
 model = joblib.load("carbon_model.pkl")
 
-# Define the feature names exactly as in the reduced model
 FEATURES = [
     "Vehicle Monthly Distance Km",
     "Frequency of Traveling by Air",
@@ -23,35 +21,30 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    # Read inputs from frontend JSON
-    vehicle_km = float(data.get("miles", 0)) 
-    flights = float(data.get("flights", 0))
-    vehicle_type = data.get("vehicle", "")
-    clothes = float(data.get("clothes", 0))
-    waste = float(data.get("waste", 0))
-    heating = data.get("heating", "")
+        # Keys now match exactly what the HTML sends
+        input_dict = {
+            "Vehicle Monthly Distance Km": float(data["vehicle_km"]),
+            "Frequency of Traveling by Air": str(data["air_travel"]),
+            "Vehicle Type":                  str(data["vehicle_type"]),
+            "How Many New Clothes Monthly":  float(data["new_clothes"]),
+            "Waste Bag Weekly Count":        float(data["waste_bags"]),
+            "Heating Energy Source":         str(data["heating_source"]),
+        }
 
-    # Build a DataFrame with the same columns
-    input_dict = {
-        "Vehicle Monthly Distance Km": vehicle_km,
-        "Frequency of Traveling by Air": flights,
-        "Vehicle Type": vehicle_type,
-        "How Many New Clothes Monthly": clothes,
-        "Waste Bag Weekly Count": waste,
-        "Heating Energy Source": heating
-    }
+        features = pd.DataFrame([input_dict], columns=FEATURES)
+        prediction = model.predict(features)[0]
+        
 
-    features = pd.DataFrame([input_dict], columns=FEATURES)
+        return jsonify({
+            "user_emissions": round(float(prediction), 2), "us_average": 4000})
 
-    # Predict
-    prediction = model.predict(features)[0]
-
-    return jsonify({
-        "user_emissions": round(prediction, 2),
-        "us_average": round(2269, 2)
-    })
+    except KeyError as e:
+        return jsonify({"error": f"Missing field: {e}"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8000)

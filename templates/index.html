@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbon Footprint Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e1a12;
+      --surface:   #162019;
+      --card:      #1c2b20;
+      --border:    #2e4535;
+      --green:     #5dbd7a;
+      --green-dim: #3a7a4e;
+      --amber:     #e8b94a;
+      --red:       #e06b55;
+      --text:      #d4e8d8;
+      --muted:     #6e917a;
+      --white:     #f0f7f2;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background texture ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 0%, #1d3d2440 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 100%, #0e2e1a40 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 60px 24px 40px;
+    }
+
+    .header-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #1c3325; border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 0.12em;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .header-badge::before { content: '●'; font-size: 8px; color: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    h1 em { color: var(--green); font-style: italic; }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Progress ── */
+    .progress-wrap {
+      position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto 12px;
+      padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .progress-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
+    }
+    .progress-bar-wrap {
+      position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto 40px;
+      padding: 0 24px;
+    }
+    .progress-track {
+      height: 3px; background: var(--border); border-radius: 4px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: 0%; background: var(--green);
+      border-radius: 4px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Form wrapper ── */
+    #surveyForm {
+      position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Question cards ── */
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 16px;
+      transition: border-color 0.25s, transform 0.25s;
+      animation: slideUp 0.4s ease both;
+    }
+    .q-card:hover { border-color: var(--green-dim); transform: translateY(-1px); }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-card:nth-child(1) { animation-delay: 0.05s }
+    .q-card:nth-child(2) { animation-delay: 0.10s }
+    .q-card:nth-child(3) { animation-delay: 0.15s }
+    .q-card:nth-child(4) { animation-delay: 0.20s }
+    .q-card:nth-child(5) { animation-delay: 0.25s }
+    .q-card:nth-child(6) { animation-delay: 0.30s }
+
+    .q-header {
+      display: flex; align-items: flex-start; gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .q-icon {
+      font-size: 22px; line-height: 1;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    .q-meta { flex: 1; }
+
+    .q-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 0.12em;
+      color: var(--green); text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .q-label {
+      font-size: 16px; font-weight: 700;
+      color: var(--white); line-height: 1.3;
+    }
+
+    /* ── Radio options ── */
+    .options { display: flex; flex-direction: column; gap: 10px; }
+
+    .option {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 18px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .option:hover { border-color: var(--green-dim); background: #1e2e22; }
+    .option input[type="radio"] { display: none; }
+    .option.selected {
+      border-color: var(--green);
+      background: #1d3325;
+    }
+
+    .option-key {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .option.selected .option-key {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .option-text { flex: 1; }
+    .option-name {
+      font-size: 14px; font-weight: 600;
+      color: var(--white); margin-bottom: 2px;
+    }
+    .option-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; color: var(--muted);
+    }
+
+    /* ── Submit button ── */
+    .submit-wrap {
+      margin-top: 32px; text-align: center;
+    }
+
+    button[type="submit"] {
+      background: var(--green);
+      color: var(--bg);
+      border: none;
+      border-radius: 100px;
+      padding: 16px 48px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px; font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      box-shadow: 0 0 0 0 #5dbd7a44;
+    }
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px #5dbd7a33;
+      background: #6ed18c;
+    }
+    button[type="submit"]:active { transform: translateY(0); }
+    button[type="submit"]:disabled {
+      background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none;
+    }
+
+    /* ── Results ── */
+    #results {
+      position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto 80px;
+      padding: 0 24px;
+      display: none;
+      animation: slideUp 0.5s ease both;
+    }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      margin-bottom: 16px;
+    }
+
+    .result-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(3rem, 10vw, 5.5rem);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .result-number span { font-size: 0.4em; font-family: 'Syne', sans-serif; font-weight: 600; color: var(--muted); vertical-align: super; }
+
+    .result-verdict {
+      display: inline-flex; align-items: center; gap: 8px;
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px; font-weight: 700;
+      margin: 16px 0;
+    }
+    .verdict-low    { background: #1a3d2a; color: #5dbd7a; border: 1px solid #2e6040; }
+    .verdict-medium { background: #3d3010; color: #e8b94a; border: 1px solid #6b5520; }
+    .verdict-high   { background: #3d2010; color: #e8844a; border: 1px solid #6b3a20; }
+    .verdict-very   { background: #3d1510; color: #e06b55; border: 1px solid #6b2818; }
+
+    .result-tip {
+      color: var(--muted); font-size: 14px; line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+    }
+    .chart-title {
+      font-size: 13px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+
+    .retry-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 12px 28px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px; font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      margin-top: 24px;
+    }
+    .retry-btn:hover { border-color: var(--green); color: var(--green); }
+
+    /* ── Error ── */
+    .error-toast {
+      background: #2e1a18; border: 1px solid #6b2a22;
+      border-radius: 10px; padding: 14px 18px;
+      color: var(--red); font-size: 13px;
+      display: none; margin-top: 16px;
+    }
+
+    /* ── Loading spinner ── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid #1c3325;
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block; vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 500px) {
+      .q-card { padding: 22px 20px; }
+      .result-card, .chart-card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-badge">Carbon Footprint Predictor</div>
+    <h1>How much CO₂ do<br><em>you</em> produce?</h1>
+    <p class="subtitle">Answer 6 quick questions and we'll estimate your annual carbon footprint.</p>
+  </header>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <span class="progress-label">Progress</span>
+    <span class="progress-label" id="progressText">0 / 6</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <form id="surveyForm">
+
+    <!-- Q1: Driving -->
+    <div class="q-card">
+      <div class="q-header">
+        <div class="q-icon">🚗</div>
+        <div class="q-meta">
+          <div class="q-num">Question 01</div>
+          <div class="q-label">How much do you drive monthly?</div>
+        </div>
+      </div>
+      <div class="options" data-name="driving">
+        <label class="option">
+          <input type="radio" name="driving" value="1000">
+          <div class="option-key">1</div>
+          <div class="option-text">
+            <div class="option-name">Low</div>
+            <div class="option-desc">0 – 1,250 miles / month</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="driving" value="4000">
+          <div class="option-key">2</div>
+          <div class="option-text">
+            <div class="option-name">Medium</div>
+            <div class="option-desc">1,250 – 3,700 miles / month</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="driving" value="9000">
+          <div class="option-key">3</div>
+          <div class="option-text">
+            <div class="option-name">High</div>
+            <div class="option-desc">3,700+ miles / month</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q2: Vehicle Type -->
+    <div class="q-card">
+      <div class="q-header">
+        <div class="q-icon">🚙</div>
+        <div class="q-meta">
+          <div class="q-num">Question 02</div>
+          <div class="q-label">What type of vehicle do you use?</div>
+        </div>
+      </div>
+      <div class="options" data-name="vehicle">
+        <label class="option">
+          <input type="radio" name="vehicle" value="electric">
+          <div class="option-key">1</div>
+          <div class="option-text">
+            <div class="option-name">Electric</div>
+            <div class="option-desc">Battery-powered EV</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="vehicle" value="hybrid">
+          <div class="option-key">2</div>
+          <div class="option-text">
+            <div class="option-name">Hybrid</div>
+            <div class="option-desc">Gas + electric motor</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="vehicle" value="petrol">
+          <div class="option-key">3</div>
+          <div class="option-text">
+            <div class="option-name">Petrol / Diesel</div>
+            <div class="option-desc">Traditional combustion engine</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="vehicle" value="none">
+          <div class="option-key">4</div>
+          <div class="option-text">
+            <div class="option-name">No Car</div>
+            <div class="option-desc">Walk, bike, or transit only</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q3: Air Travel -->
+    <div class="q-card">
+      <div class="q-header">
+        <div class="q-icon">✈️</div>
+        <div class="q-meta">
+          <div class="q-num">Question 03</div>
+          <div class="q-label">How often do you fly per year?</div>
+        </div>
+      </div>
+      <div class="options" data-name="air">
+        <label class="option">
+          <input type="radio" name="air" value="rarely">
+          <div class="option-key">1</div>
+          <div class="option-text">
+            <div class="option-name">Rarely</div>
+            <div class="option-desc">0 – 2 flights / year</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="air" value="frequently">
+          <div class="option-key">2</div>
+          <div class="option-text">
+            <div class="option-name">Sometimes</div>
+            <div class="option-desc">3 – 5 flights / year</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="air" value="very frequently">
+          <div class="option-key">3</div>
+          <div class="option-text">
+            <div class="option-name">Often</div>
+            <div class="option-desc">6+ flights / year</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q4: Clothing -->
+    <div class="q-card">
+      <div class="q-header">
+        <div class="q-icon">👕</div>
+        <div class="q-meta">
+          <div class="q-num">Question 04</div>
+          <div class="q-label">How many new clothing items per month?</div>
+        </div>
+      </div>
+      <div class="options" data-name="clothes">
+        <label class="option">
+          <input type="radio" name="clothes" value="1">
+          <div class="option-key">1</div>
+          <div class="option-text">
+            <div class="option-name">Low</div>
+            <div class="option-desc">0 – 2 items / month</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="clothes" value="4">
+          <div class="option-key">2</div>
+          <div class="option-text">
+            <div class="option-name">Medium</div>
+            <div class="option-desc">3 – 5 items / month</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="clothes" value="7">
+          <div class="option-key">3</div>
+          <div class="option-text">
+            <div class="option-name">High</div>
+            <div class="option-desc">6+ items / month</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q5: Waste -->
+    <div class="q-card">
+      <div class="q-header">
+        <div class="q-icon">🗑️</div>
+        <div class="q-meta">
+          <div class="q-num">Question 05</div>
+          <div class="q-label">How much trash do you produce weekly?</div>
+        </div>
+      </div>
+      <div class="options" data-name="waste">
+        <label class="option">
+          <input type="radio" name="waste" value="1">
+          <div class="option-key">1</div>
+          <div class="option-text">
+            <div class="option-name">Low</div>
+            <div class="option-desc">~1 bag / week</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="waste" value="2">
+          <div class="option-key">2</div>
+          <div class="option-text">
+            <div class="option-name">Medium</div>
+            <div class="option-desc">2 – 3 bags / week</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="waste" value="4">
+          <div class="option-key">3</div>
+          <div class="option-text">
+            <div class="option-name">High</div>
+            <div class="option-desc">4+ bags / week</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q6: Heating -->
+    <div class="q-card">
+      <div class="q-header">
+        <div class="q-icon">🔥</div>
+        <div class="q-meta">
+          <div class="q-num">Question 06</div>
+          <div class="q-label">What's your primary home energy source?</div>
+        </div>
+      </div>
+      <div class="options" data-name="heating">
+        <label class="option">
+          <input type="radio" name="heating" value="electricity">
+          <div class="option-key">1</div>
+          <div class="option-text">
+            <div class="option-name">Electricity</div>
+            <div class="option-desc">Grid-powered heating & cooling</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="heating" value="natural gas">
+          <div class="option-key">2</div>
+          <div class="option-text">
+            <div class="option-name">Natural Gas</div>
+            <div class="option-desc">Gas furnace or boiler</div>
+          </div>
+        </label>
+        <label class="option">
+          <input type="radio" name="heating" value="wood">
+          <div class="option-key">3</div>
+          <div class="option-text">
+            <div class="option-name">Renewable / Other</div>
+            <div class="option-desc">Solar, wood, heat pump, etc.</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <div class="error-toast" id="errorToast">⚠ Please answer all 6 questions before submitting.</div>
+      <button type="submit" id="submitBtn" disabled>Calculate my footprint →</button>
+    </div>
+
+  </form>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="result-card">
+      <div class="q-num" style="margin-bottom:10px;">Your Estimated Footprint</div>
+      <div class="result-number" id="resultNumber" style="color: var(--green)">—</div>
+      <div id="resultVerdict"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">You vs. Average</div>
+      <canvas id="chart" height="160"></canvas>
+    </div>
+    <div style="text-align:center">
+      <button class="retry-btn" id="retryBtn">↩ Retake survey</button>
+    </div>
+  </div>
+
+<script>
+  const US_AVG = 4000;
+
+  // ── Progress tracking ──────────────────────────────────────────────────────
+  const answered = new Set();
+
+  document.querySelectorAll('.options').forEach(group => {
+    group.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        // clear selected in this group
+        group.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        opt.querySelector('input').checked = true;
+        answered.add(group.dataset.name);
+        updateProgress();
+      });
+    });
+  });
+
+  function updateProgress() {
+    const n = answered.size;
+    document.getElementById('progressText').textContent = `${n} / 6`;
+    document.getElementById('progressFill').style.width = `${(n / 6) * 100}%`;
+    document.getElementById('submitBtn').disabled = n < 6;
+  }
+
+  // ── Form submit ────────────────────────────────────────────────────────────
+  document.getElementById('surveyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (answered.size < 6) {
+      document.getElementById('errorToast').style.display = 'block';
+      return;
+    }
+    document.getElementById('errorToast').style.display = 'none';
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<span class="spinner"></span>Calculating…';
+    btn.disabled = true;
+
+    const payload = {
+      vehicle_km:     Number(document.querySelector('[name="driving"]:checked').value),
+      vehicle_type:   document.querySelector('[name="vehicle"]:checked').value,
+      air_travel:     document.querySelector('[name="air"]:checked').value,
+      new_clothes:    Number(document.querySelector('[name="clothes"]:checked').value),
+      waste_bags:     Number(document.querySelector('[name="waste"]:checked').value),
+      heating_source: document.querySelector('[name="heating"]:checked').value,
+    };
+
+    fetch('/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) throw new Error(data.error);
+      showResults(data.user_emissions ?? data.prediction);
+    })
+    .catch(err => {
+      btn.innerHTML = 'Calculate my footprint →';
+      btn.disabled = false;
+      document.getElementById('errorToast').style.display = 'block';
+      document.getElementById('errorToast').textContent = '⚠ ' + err.message;
+    });
+  });
+
+  // ── Show results ───────────────────────────────────────────────────────────
+  function showResults(kg) {
+    document.getElementById('surveyForm').style.display = 'none';
+    document.querySelector('header').style.display = 'none';
+    document.querySelector('.progress-wrap').style.display = 'none';
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+
+    const res = document.getElementById('results');
+    res.style.display = 'block';
+
+    const num = document.getElementById('resultNumber');
+    num.innerHTML = `${kg.toLocaleString()}<span>kg CO₂/yr</span>`;
+
+    // verdict
+    let cls, icon, label;
+    if (kg < US_AVG * 0.5) {
+      cls='verdict-low'; icon='✅'; label='Low footprint';
+      num.style.color = 'var(--green)';
+    } else if (kg < US_AVG * 0.85) {
+      cls='verdict-medium'; icon='⚠️'; label='Moderate footprint';
+      num.style.color = 'var(--amber)';
+    } else if (kg < US_AVG * 1.15) {
+      cls='verdict-high'; icon='🟠'; label='High footprint';
+      num.style.color = '#e8844a';
+    } else {
+      cls='verdict-very'; icon='🔴'; label='Very high footprint';
+      num.style.color = 'var(--red)';
+    }
+
+    document.getElementById('resultVerdict').innerHTML =
+      `<div class="result-verdict ${cls}">${icon} ${label}</div>`;
+
+    // chart
+    if (window.myChart) window.myChart.destroy();
+    window.myChart = new Chart(document.getElementById('chart'), {
+      type: 'bar',
+      data: {
+        labels: ['You', 'US Average'],
+        datasets: [{
+          data: [kg, US_AVG],
+          backgroundColor: ['#5dbd7a33', '#e8b94a22'],
+          borderColor:     ['#5dbd7a',   '#e8b94a'],
+          borderWidth: 2,
+          borderRadius: 8,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.parsed.y.toLocaleString()} kg CO₂`
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#6e917a', font: { family: 'DM Mono', size: 11 } }, grid: { display: false }, border: { display: false } },
+          y: {
+            ticks: { color: '#6e917a', font: { family: 'DM Mono', size: 10 }, callback: v => v.toLocaleString() },
+            grid: { color: '#2e453522' }, border: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Retry ──────────────────────────────────────────────────────────────────
+  document.getElementById('retryBtn').addEventListener('click', () => {
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('surveyForm').style.display = 'block';
+    document.querySelector('header').style.display = 'block';
+    document.querySelector('.progress-wrap').style.display = 'flex';
+    document.querySelector('.progress-bar-wrap').style.display = 'block';
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    answered.clear();
+    updateProgress();
+    document.getElementById('submitBtn').innerHTML = 'Calculate my footprint →';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+</body>
+</html>
